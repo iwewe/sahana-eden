@@ -105,6 +105,24 @@ if [ "$DB_CHOICE" = "2" ]; then
     done
 fi
 
+# Python package installation method (Ubuntu 24.04 compatibility)
+print_info "Select Python package installation method:"
+echo "1) System-wide installation (use --break-system-packages)"
+echo "   Recommended for: Dedicated server, production deployment"
+echo "2) Virtual environment (isolated Python environment)"
+echo "   Recommended for: Development, shared server"
+read -p "Enter choice [1-2, default: 1]: " PIP_METHOD
+PIP_METHOD=${PIP_METHOD:-1}
+
+USE_VENV="no"
+PIP_FLAGS=""
+if [ "$PIP_METHOD" = "2" ]; then
+    USE_VENV="yes"
+    VENV_PATH="$INSTALL_DIR/venv"
+else
+    PIP_FLAGS="--break-system-packages"
+fi
+
 # Create installation directory
 print_header "Creating Installation Directory"
 mkdir -p "$INSTALL_DIR"
@@ -152,34 +170,48 @@ print_success "System dependencies installed"
 
 # Install Python dependencies
 print_header "Installing Python Dependencies"
+
+# Setup virtual environment if selected
+if [ "$USE_VENV" = "yes" ]; then
+    print_info "Creating Python virtual environment..."
+    python3 -m venv "$VENV_PATH"
+    source "$VENV_PATH/bin/activate"
+    PIP_CMD="$VENV_PATH/bin/pip"
+    PYTHON_CMD="$VENV_PATH/bin/python3"
+    print_success "Virtual environment created at $VENV_PATH"
+else
+    PIP_CMD="pip3"
+    PYTHON_CMD="python3"
+fi
+
 print_info "Installing core Python packages..."
 
 # Upgrade pip
-pip3 install --upgrade pip
+$PIP_CMD install --upgrade pip $PIP_FLAGS
 
 # Install core requirements
-pip3 install python-dateutil>=2.7.3
-pip3 install lxml>=4.4.2
-pip3 install requests>=2.26.0
+$PIP_CMD install $PIP_FLAGS python-dateutil>=2.7.3
+$PIP_CMD install $PIP_FLAGS lxml>=4.4.2
+$PIP_CMD install $PIP_FLAGS requests>=2.26.0
 
 print_info "Installing optional Python packages (this may take a while)..."
 
 # Install optional but recommended packages
-pip3 install openpyxl>=3.0.9
-pip3 install geopy>=2.0.0
-pip3 install Shapely>=1.7.0
-pip3 install Pillow>=8.4.0
-pip3 install reportlab>=3.6.8
-pip3 install xlwt>=1.3.0
-pip3 install xlrd>=1.2.0
-pip3 install pyserial>=2.6
-pip3 install pyparsing>=2.2.0
-pip3 install translate-toolkit>=1.0.1
+$PIP_CMD install $PIP_FLAGS openpyxl>=3.0.9
+$PIP_CMD install $PIP_FLAGS geopy>=2.0.0
+$PIP_CMD install $PIP_FLAGS Shapely>=1.7.0
+$PIP_CMD install $PIP_FLAGS Pillow>=8.4.0
+$PIP_CMD install $PIP_FLAGS reportlab>=3.6.8
+$PIP_CMD install $PIP_FLAGS xlwt>=1.3.0
+$PIP_CMD install $PIP_FLAGS xlrd>=1.2.0
+$PIP_CMD install $PIP_FLAGS pyserial>=2.6
+$PIP_CMD install $PIP_FLAGS pyparsing>=2.2.0
+$PIP_CMD install $PIP_FLAGS translate-toolkit>=1.0.1
 
 # Try to install GDAL (may fail, not critical)
 print_info "Attempting to install GDAL Python bindings..."
 export GDAL_CONFIG=/usr/bin/gdal-config
-pip3 install GDAL==$(gdal-config --version) || print_warning "GDAL Python bindings installation failed (non-critical)"
+$PIP_CMD install $PIP_FLAGS GDAL==$(gdal-config --version) || print_warning "GDAL Python bindings installation failed (non-critical)"
 
 print_success "Python dependencies installed"
 
@@ -289,7 +321,7 @@ print_header "Initializing Database"
 print_info "This may take several minutes on first run..."
 
 cd "$INSTALL_DIR/web2py"
-python3 web2py.py -S eden -M -R applications/eden/static/scripts/tools/noop.py
+$PYTHON_CMD web2py.py -S eden -M -R applications/eden/static/scripts/tools/noop.py
 
 print_success "Database initialized"
 
@@ -313,9 +345,14 @@ $(if [ "$DB_TYPE" = "postgres" ]; then echo "After=postgresql.service"; fi)
 Type=simple
 User=${SUDO_USER:-root}
 WorkingDirectory=$INSTALL_DIR/web2py
-ExecStart=/usr/bin/python3 $INSTALL_DIR/web2py/web2py.py --no_gui --password=$WEB2PY_PASSWORD --ip=0.0.0.0 --port=8000
+$(if [ "$USE_VENV" = "yes" ]; then
+    echo "ExecStart=$PYTHON_CMD $INSTALL_DIR/web2py/web2py.py --no_gui --password=$WEB2PY_PASSWORD --ip=0.0.0.0 --port=8000"
+else
+    echo "ExecStart=/usr/bin/python3 $INSTALL_DIR/web2py/web2py.py --no_gui --password=$WEB2PY_PASSWORD --ip=0.0.0.0 --port=8000"
+fi)
 Restart=on-failure
 RestartSec=10
+$(if [ "$USE_VENV" = "yes" ]; then echo "Environment=\"PATH=$VENV_PATH/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\""; fi)
 
 [Install]
 WantedBy=multi-user.target
@@ -331,7 +368,10 @@ print_header "Creating Helper Scripts"
 cat > "$INSTALL_DIR/start_eden.sh" << EOF
 #!/bin/bash
 cd $INSTALL_DIR/web2py
-python3 web2py.py --no_gui -a $WEB2PY_PASSWORD -i 0.0.0.0 -p 8000
+$(if [ "$USE_VENV" = "yes" ]; then
+    echo "source $VENV_PATH/bin/activate"
+fi)
+$PYTHON_CMD web2py.py --no_gui -a $WEB2PY_PASSWORD -i 0.0.0.0 -p 8000
 EOF
 chmod +x "$INSTALL_DIR/start_eden.sh"
 
@@ -341,6 +381,34 @@ cat > "$INSTALL_DIR/eden_status.sh" << EOF
 systemctl status sahana-eden.service
 EOF
 chmod +x "$INSTALL_DIR/eden_status.sh"
+
+# Environment info script
+cat > "$INSTALL_DIR/eden_info.sh" << EOF
+#!/bin/bash
+echo "Sahana Eden Installation Information"
+echo "====================================="
+echo "Installation Directory: $INSTALL_DIR"
+echo "Database Type: $DB_TYPE"
+$(if [ "$DB_TYPE" = "postgres" ]; then
+    echo "echo \"Database Name: $DB_NAME\""
+    echo "echo \"Database User: $DB_USER\""
+fi)
+echo "Python Environment: $(if [ "$USE_VENV" = "yes" ]; then echo "Virtual Environment"; else echo "System-wide"; fi)"
+$(if [ "$USE_VENV" = "yes" ]; then
+    echo "echo \"Virtual Environment: $VENV_PATH\""
+fi)
+echo ""
+echo "Python Version:"
+$PYTHON_CMD --version
+echo ""
+echo "Installed Packages:"
+$(if [ "$USE_VENV" = "yes" ]; then
+    echo "$VENV_PATH/bin/pip list"
+else
+    echo "pip3 list | grep -E '(lxml|dateutil|requests|openpyxl|geopy|shapely|reportlab)'"
+fi)
+EOF
+chmod +x "$INSTALL_DIR/eden_info.sh"
 
 print_success "Helper scripts created"
 
@@ -357,6 +425,7 @@ if [ "$DB_TYPE" = "postgres" ]; then
     echo "  - Database name: $DB_NAME"
     echo "  - Database user: $DB_USER"
 fi
+echo "  - Python environment: $(if [ "$USE_VENV" = "yes" ]; then echo "Virtual Environment ($VENV_PATH)"; else echo "System-wide"; fi)"
 echo ""
 print_info "To start Sahana Eden:"
 echo ""
@@ -385,7 +454,17 @@ print_info "Additional commands:"
 echo "  - Check status: sudo systemctl status sahana-eden"
 echo "  - Stop server: sudo systemctl stop sahana-eden"
 echo "  - View logs: sudo journalctl -u sahana-eden -f"
+echo "  - View installation info: $INSTALL_DIR/eden_info.sh"
 echo ""
+if [ "$USE_VENV" = "yes" ]; then
+    echo ""
+    print_info "Virtual Environment:"
+    echo "  - Activate: source $VENV_PATH/bin/activate"
+    echo "  - Deactivate: deactivate"
+    echo "  - Python: $VENV_PATH/bin/python3"
+    echo "  - Pip: $VENV_PATH/bin/pip"
+    echo ""
+fi
 print_info "For more information, visit:"
 echo "  - Documentation: https://eden-asp.readthedocs.io"
 echo "  - Wiki: https://eden.sahanafoundation.org"

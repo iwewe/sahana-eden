@@ -140,6 +140,27 @@ sudo -u postgres psql -d sahana < backup.sql
 
 ## 🔧 Troubleshooting Cepat
 
+### Error: externally-managed-environment (Ubuntu 24.04)
+
+Jika muncul error saat instalasi:
+```
+error: externally-managed-environment
+```
+
+**Solusi:** Gunakan script instalasi terbaru yang sudah handle issue ini otomatis.
+
+Download ulang:
+```bash
+curl -fsSL -o install_sahana.sh https://raw.githubusercontent.com/iwewe/sahana-eden/claude/ubuntu-install-script-01HYFeoM2PANKP5hESyCP9Gj/install_sahana_ubuntu24.sh
+sudo bash install_sahana.sh
+```
+
+Script akan menawarkan 2 pilihan:
+1. System-wide (untuk production)
+2. Virtual environment (untuk development)
+
+Detail lengkap: [TROUBLESHOOTING_PYTHON_ENV.md](TROUBLESHOOTING_PYTHON_ENV.md)
+
 ### Server tidak bisa diakses?
 ```bash
 # Cek status service

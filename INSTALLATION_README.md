@@ -203,11 +203,26 @@ sudo journalctl -u sahana-eden -f
 
 ---
 
+## ⚠️ Ubuntu 24.04 Users
+
+If you encounter `externally-managed-environment` error, the latest script handles this automatically!
+
+**Quick Fix:**
+1. Download latest script
+2. Choose installation method when prompted:
+   - System-wide (production)
+   - Virtual environment (development)
+
+See: [TROUBLESHOOTING_PYTHON_ENV.md](TROUBLESHOOTING_PYTHON_ENV.md)
+
+---
+
 ## 🆘 Need Help?
 
 - **Quick Start**: See `QUICK_START.md`
 - **Full Guide**: See `INSTALL_UBUNTU.md`
 - **All Commands**: See `INSTALLATION_COMMANDS.md`
+- **Python Issues**: See `TROUBLESHOOTING_PYTHON_ENV.md`
 - **Issues**: https://github.com/iwewe/sahana-eden/issues
 
 ---

@@ -74,6 +74,9 @@ Script akan meminta informasi berikut:
    - Nama database (default: `sahana`)
    - Username database (default: `sahana`)
    - Password database
+5. **Metode instalasi Python packages** (Ubuntu 24.04):
+   - System-wide dengan `--break-system-packages` (recommended untuk production)
+   - Virtual environment (recommended untuk development/shared server)
 
 ### 4. Tunggu Proses Instalasi
 
@@ -202,6 +205,26 @@ sudo systemctl restart nginx
 sudo apt-get install certbot python3-certbot-nginx
 sudo certbot --nginx -d your-domain.com
 ```
+
+## Ubuntu 24.04 Specific: Python Environment Issues
+
+Ubuntu 24.04 menggunakan Python 3.11+ yang memiliki proteksi untuk mencegah instalasi packages yang merusak system. Jika Anda mengalami error:
+
+```
+error: externally-managed-environment
+```
+
+**Solusi:** Script instalasi terbaru sudah menangani ini secara otomatis dengan 2 pilihan:
+
+1. **System-wide installation** - Menggunakan `--break-system-packages` flag
+   - Untuk: Dedicated server, production
+
+2. **Virtual environment** - Membuat isolated Python environment
+   - Untuk: Development, shared server
+
+Lihat dokumentasi lengkap di [TROUBLESHOOTING_PYTHON_ENV.md](TROUBLESHOOTING_PYTHON_ENV.md)
+
+---
 
 ## Troubleshooting
 
