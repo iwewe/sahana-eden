@@ -1,20 +1,59 @@
 # Quick Start Guide - Sahana Eden Ubuntu 24.04
 
-## 🚀 Instalasi dalam 3 Langkah
+## 🚀 Instalasi Cepat (Pilih Salah Satu)
 
-### 1. Clone Repository
+### Metode 1: One-Line Install dengan curl (Paling Cepat!)
+
 ```bash
-git clone https://github.com/sahana/eden.git
-cd eden
+curl -fsSL https://raw.githubusercontent.com/iwewe/sahana-eden/claude/ubuntu-install-script-01HYFeoM2PANKP5hESyCP9Gj/install_sahana_ubuntu24.sh | sudo bash
 ```
 
-### 2. Jalankan Script Instalasi
+### Metode 2: Download & Review (Recommended untuk Production)
+
 ```bash
+# Download script
+curl -fsSL -o install_sahana.sh https://raw.githubusercontent.com/iwewe/sahana-eden/claude/ubuntu-install-script-01HYFeoM2PANKP5hESyCP9Gj/install_sahana_ubuntu24.sh
+
+# Review script terlebih dahulu (PENTING!)
+less install_sahana.sh
+
+# Jalankan instalasi
+sudo bash install_sahana.sh
+```
+
+### Metode 3: Git Clone (Untuk Development)
+
+```bash
+# Clone repository
+git clone https://github.com/iwewe/sahana-eden.git
+cd sahana-eden
+
+# Checkout branch installation script
+git checkout claude/ubuntu-install-script-01HYFeoM2PANKP5hESyCP9Gj
+
+# Jalankan instalasi
 sudo bash install_sahana_ubuntu24.sh
 ```
 
-### 3. Start Server
+### Metode 4: Git Pull (Update Existing Repo)
+
 ```bash
+# Jika sudah punya repository
+cd /path/to/sahana-eden
+
+# Pull latest changes
+git fetch origin
+git checkout claude/ubuntu-install-script-01HYFeoM2PANKP5hESyCP9Gj
+git pull origin claude/ubuntu-install-script-01HYFeoM2PANKP5hESyCP9Gj
+
+# Jalankan instalasi
+sudo bash install_sahana_ubuntu24.sh
+```
+
+### Setelah Instalasi Selesai
+
+```bash
+# Start server
 sudo systemctl start sahana-eden
 ```
 
@@ -69,6 +108,11 @@ sudo ./start_eden.sh
 ## ✅ Verifikasi Instalasi
 
 ```bash
+# Download verification script
+curl -fsSL -o verify_installation.sh https://raw.githubusercontent.com/iwewe/sahana-eden/claude/ubuntu-install-script-01HYFeoM2PANKP5hESyCP9Gj/verify_installation.sh
+chmod +x verify_installation.sh
+
+# Run verification
 bash verify_installation.sh
 ```
 

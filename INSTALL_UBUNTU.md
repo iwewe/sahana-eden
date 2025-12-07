@@ -21,16 +21,43 @@ Dokumen ini memberikan panduan lengkap untuk menginstal Sahana Eden di server Ub
 
 ## Instalasi Cepat
 
-### 1. Download atau Clone Repository
+### Pilih Metode Instalasi
+
+#### Metode 1: curl (One-Line Install)
 
 ```bash
-git clone https://github.com/sahana/eden.git
-cd eden
+curl -fsSL https://raw.githubusercontent.com/iwewe/sahana-eden/claude/ubuntu-install-script-01HYFeoM2PANKP5hESyCP9Gj/install_sahana_ubuntu24.sh | sudo bash
 ```
 
-### 2. Jalankan Script Instalasi
+#### Metode 2: Download & Review (Recommended)
 
 ```bash
+# Download script
+curl -fsSL -o install_sahana.sh https://raw.githubusercontent.com/iwewe/sahana-eden/claude/ubuntu-install-script-01HYFeoM2PANKP5hESyCP9Gj/install_sahana_ubuntu24.sh
+
+# Review script
+less install_sahana.sh
+
+# Jalankan instalasi
+sudo bash install_sahana.sh
+```
+
+#### Metode 3: Git Clone
+
+```bash
+git clone https://github.com/iwewe/sahana-eden.git
+cd sahana-eden
+git checkout claude/ubuntu-install-script-01HYFeoM2PANKP5hESyCP9Gj
+sudo bash install_sahana_ubuntu24.sh
+```
+
+#### Metode 4: Git Pull (Existing Repository)
+
+```bash
+cd /path/to/sahana-eden
+git fetch origin
+git checkout claude/ubuntu-install-script-01HYFeoM2PANKP5hESyCP9Gj
+git pull origin claude/ubuntu-install-script-01HYFeoM2PANKP5hESyCP9Gj
 sudo bash install_sahana_ubuntu24.sh
 ```
 
