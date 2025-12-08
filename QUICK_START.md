@@ -299,3 +299,20 @@ Jika mengalami masalah:
 ---
 
 **Happy coding with Sahana Eden! 🎉**
+
+---
+
+## 📦 Aktivasi Modul Tambahan
+
+Untuk mengaktifkan modul Missing Person, Shelters, Disease Tracking, dan Incident Reporting:
+
+```bash
+# Download script aktivasi
+curl -fsSL -o activate_modules.sh https://raw.githubusercontent.com/iwewe/sahana-eden/claude/ubuntu-install-script-01HYFeoM2PANKP5hESyCP9Gj/activate_modules.sh
+
+# Jalankan aktivasi
+sudo bash activate_modules.sh
+```
+
+Lihat panduan lengkap: [MODULES_README.md](MODULES_README.md)
+

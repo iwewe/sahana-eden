@@ -223,6 +223,7 @@ See: [TROUBLESHOOTING_PYTHON_ENV.md](TROUBLESHOOTING_PYTHON_ENV.md)
 - **Full Guide**: See `INSTALL_UBUNTU.md`
 - **All Commands**: See `INSTALLATION_COMMANDS.md`
 - **Python Issues**: See `TROUBLESHOOTING_PYTHON_ENV.md`
+- **Module Activation**: See `MODULES_README.md`
 - **Issues**: https://github.com/iwewe/sahana-eden/issues
 
 ---
